@@ -1137,10 +1137,22 @@ function syncScatterSelects(changed) {
   const yEl = document.getElementById('scatter-y');
   if (!xEl || !yEl) return;
 
+  // If only one numeric column exists, both axes use it — hide X dropdown as redundant
+  if (numericCols.length <= 1) {
+    const col = numericCols[0] || '';
+    yEl.innerHTML = `<option value="${col}">${col}</option>`;
+    yEl.value = col;
+    xEl.style.display = 'none';
+    xEl.innerHTML = `<option value="${col}">${col}</option>`;
+    xEl.value = col;
+    return;
+  }
+
+  xEl.style.display = '';
   const xCur = xEl.value;
   const yCur = yEl.value;
 
-  // Rebuild whichever was NOT just changed
+  // Rebuild whichever was NOT just changed, excluding the other's current selection
   if (changed !== 'scatter-y') {
     const yCols = colsForRole('numeric', xCur);
     yEl.innerHTML = yCols.map(c => `<option value="${c}">${c}</option>`).join('');
